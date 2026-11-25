@@ -116,7 +116,7 @@ table.r th{background:#eef2f8}
 const SB_URL='https://wsktpndhlytjbnunbvxp.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indza3RwbmRobHl0amJudW5idnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMzEyNjMsImV4cCI6MjA5NzkwNzI2M30.RdQM6ovQMoq70h5r0zY-EqArzXfia-P_mZGcFTQoU_c';
 const ADMIN='관리자';
-const ERR={ADMIN_NO_REQ:'관리자 계정은 요청할 수 없습니다. 지점 계정으로 로그인해 주세요.',NO_REQ:'이미 처리된 요청입니다.',NO_STOCK:'해당 지점의 보유 수량이 없습니다.',AUTH_FAIL:'지점 또는 비밀번호가 맞지 않습니다.',STOCK_SHORT:'보유 수량이 부족합니다.',FORBIDDEN:'권한이 없습니다.',NOT_PENDING:'이미 처리된 건입니다. 새로고침해 주세요.',REASON_REQUIRED:'사유를 입력해 주세요.',PHOTO_REQUIRED:'사진을 첨부해 주세요.',PHOTO_TOO_BIG:'사진 용량이 너무 큽니다. 다른 사진을 선택해 주세요.',DUP_NAME:'이미 같은 이름의 품목이 있습니다.',SAME_LOC:'보내는 곳과 받는 곳이 같습니다.',BAD_QTY:'수량을 확인해 주세요.',OVER_RETURN:'반납 수량이 대여 잔량보다 많습니다.',NO_LOAN:'대여 건을 찾을 수 없습니다.',NAME_REQUIRED:'품목명을 입력해 주세요.',BAD_CAT:'분류를 선택해 주세요.',PW_SHORT:'비밀번호는 3자 이상이어야 합니다.',NOT_FOUND:'대상을 찾을 수 없습니다.',BAD_LOC:'보관처를 확인해 주세요.'};
+const ERR={BAD_NAME:'보관처 이름을 20자 이내로 입력해 주세요.',LOC_EXISTS:'이미 있는 이름입니다.',NO_LOC:'삭제할 수 없는 보관처입니다.',LOC_HAS_STOCK:'보유 수량이 남아 있습니다. 수량을 0으로 만든 뒤 삭제해 주세요.',LOC_HAS_HISTORY:'이동·손망실·요청 기록이 있어 삭제할 수 없습니다.',ADMIN_NO_REQ:'관리자 계정은 요청할 수 없습니다. 지점 계정으로 로그인해 주세요.',NO_REQ:'이미 처리된 요청입니다.',NO_STOCK:'해당 지점의 보유 수량이 없습니다.',AUTH_FAIL:'지점 또는 비밀번호가 맞지 않습니다.',STOCK_SHORT:'보유 수량이 부족합니다.',FORBIDDEN:'권한이 없습니다.',NOT_PENDING:'이미 처리된 건입니다. 새로고침해 주세요.',REASON_REQUIRED:'사유를 입력해 주세요.',PHOTO_REQUIRED:'사진을 첨부해 주세요.',PHOTO_TOO_BIG:'사진 용량이 너무 큽니다. 다른 사진을 선택해 주세요.',DUP_NAME:'이미 같은 이름의 품목이 있습니다.',SAME_LOC:'보내는 곳과 받는 곳이 같습니다.',BAD_QTY:'수량을 확인해 주세요.',OVER_RETURN:'반납 수량이 대여 잔량보다 많습니다.',NO_LOAN:'대여 건을 찾을 수 없습니다.',NAME_REQUIRED:'품목명을 입력해 주세요.',BAD_CAT:'분류를 선택해 주세요.',PW_SHORT:'비밀번호는 3자 이상이어야 합니다.',NOT_FOUND:'대상을 찾을 수 없습니다.',BAD_LOC:'보관처를 확인해 주세요.'};
 let ME=null,S=null,STK={},PH={},ITM={},tab='stock',fCat=0,fQ='',fMine=false,busy=false,rep=null,repYm='',logs=null;
 
 const $=s=>document.querySelector(s);
@@ -500,12 +500,15 @@ function matrixTSV(snap){
 
 /* ---------- 관리 ---------- */
 async function loadLogs(){try{logs=await call('sup_log_list',{p_limit:200});if(tab==='admin')render()}catch(e){toast(errText(e))}}
-const actTxt={req_create:'물품 요청',req_done:'요청 처리',req_reject:'요청 불가',req_cancel:'요청 취소',item_new:'신규 등록',item_edit:'품목 수정',adjust:'수량 조정',month_confirm:'월 확정',set_pw:'비번 변경',loss_reject:'손망실 반려',loss_cancel:'손망실 취소',move_reject:'이동 거절',move_cancel:'이동 취소'};
+const actTxt={loc_add:'보관처 추가',loc_remove:'보관처 삭제',req_create:'물품 요청',req_done:'요청 처리',req_reject:'요청 불가',req_cancel:'요청 취소',item_new:'신규 등록',item_edit:'품목 수정',adjust:'수량 조정',month_confirm:'월 확정',set_pw:'비번 변경',loss_reject:'손망실 반려',loss_cancel:'손망실 취소',move_reject:'이동 거절',move_cancel:'이동 취소'};
 function actName(a){if(actTxt[a])return actTxt[a];const [k,s]=a.split(':');const m={move_create:'이동 등록',move_done:'이동 완료',loss_create:'손망실 신고',loss_done:'손망실 확정'}[k];return m?m+(s?'('+({perm:'영구',loan:'대여','return':'반납',loss:'손실',lost:'망실'}[s]||s)+')':''):a}
 function vAdmin(){
   const br=S.locs.filter(l=>l.login);
   return `<div class="card"><h2>지점 비밀번호 변경</h2><div class="grid2" style="gap:10px">${br.map(l=>`<div class="item" style="margin:0"><b>${esc(l.code)}</b><div class="row" style="margin-top:6px;flex-wrap:nowrap"><input type="text" placeholder="새 비밀번호" data-pwin="${esc(l.code)}"><button class="btn sm" data-pw="${esc(l.code)}">변경</button></div></div>`).join('')}</div>
    <div class="row" style="margin-top:12px"><button class="btn line sm" id="pw-admin">관리자 비밀번호 변경</button></div></div>
+  <div class="card"><h2>기타 보관처(부서) 관리 <span class="sub">비스카이 등 지점 외 보관처 · 현황표 '기타'에 표시됩니다</span></h2>
+   ${S.locs.filter(l=>l.grp==='기타').map(l=>`<div class="item" style="margin-bottom:6px"><div class="row" style="flex-wrap:nowrap"><b style="flex:1">${esc(l.code)}</b><span class="d" style="font-size:12px;color:var(--mut)">보유 ${fmt(S.items.reduce((a,i)=>a+q(i.id,l.code),0))}개</span><button class="btn sm red" data-lc="del" data-n="${esc(l.code)}">삭제</button></div></div>`).join('')||'<div class="empty">없음</div>'}
+   <div class="row" style="margin-top:10px;flex-wrap:nowrap"><input type="text" id="lc-name" placeholder="추가할 부서·보관처 이름 (예: 총무팀)" maxlength="20"><button class="btn sm" id="lc-add">추가</button></div></div>
   <div class="card"><h2>품목 관리 <span class="sub">이름·사진·메모 수정, 사용 중지</span></h2>
    ${S.items.map(i=>`<div class="item" style="margin-bottom:6px"><div class="top">${img(i,'')}<div style="flex:1"><div class="t">${i.cat_no}-${i.item_no} ${esc(i.name)} ${i.active?'':'<span class="tag c">사용중지</span>'}</div><div class="d">${esc(i.cat_name)} · 합계 ${fmt(total(i.id))}${i.note?' · '+esc(i.note):''}</div></div><button class="btn sm gray" data-edit="${i.id}">수정</button></div></div>`).join('')}</div>
   <div class="card"><h2>변경 이력 <span class="sub">최근 200건</span><button class="btn sm gray" id="lg-reload" style="margin-left:auto">새로고침</button></h2>
@@ -538,6 +541,8 @@ function bind(){
     if(a==='reject')return textPrompt('거절 사유','예) 수량이 다릅니다',v=>act('sup_move_resolve',{p_id:id,p_action:'reject',p_reason:v},'거절했습니다.'));
     if(a==='cancel'&&!confirm('이 건을 취소할까요?'))return;
     act('sup_move_resolve',{p_id:id,p_action:a,p_reason:null},a==='confirm'?'확인했습니다. 수량이 반영되었습니다.':'취소했습니다.')});
+  on('#lc-add',()=>{const v=($('#lc-name').value||'').trim();if(!v)return toast('이름을 입력해 주세요.');act('sup_loc_add',{p_name:v},'"'+v+'" 보관처를 추가했습니다.')});
+  M.querySelectorAll('[data-lc]').forEach(b=>b.onclick=()=>{const n=b.dataset.n;if(!confirm('"'+n+'" 보관처를 삭제할까요?\n(보유 수량이 0이고 기록이 없을 때만 삭제됩니다)'))return;act('sup_loc_remove',{p_name:n},'삭제했습니다.')});
   M.querySelectorAll('[data-rq]').forEach(b=>b.onclick=()=>{const id=+b.dataset.id,a=b.dataset.rq,x=(S.reqs||[]).find(z=>z.id===id);if(!x)return;
     if(a==='go')return moveForm(x.item_id,{from:x.from_loc,to:x.req_loc,qty:x.qty,memo:x.memo,req:x.id});
     if(a==='reject')return textPrompt('불가 사유','예) 행사 일정으로 사용 중입니다',v=>act('sup_req_resolve',{p_id:id,p_action:'reject',p_reason:v},'불가로 회신했습니다.'));
