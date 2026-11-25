@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>판촉비품 관리</title>
+<style>
+:root{--ac:#2f5f9e;--ac2:#4f81bd;--bg:#f3f5f8;--card:#fff;--line:#dde3ec;--tx:#1d2733;--mut:#6b7788;--ok:#1f8a4c;--warn:#c77700;--bad:#c62f2f;--soft:#eaf1fb}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--tx);font-family:'Malgun Gothic','Apple SD Gothic Neo',system-ui,sans-serif;font-size:14px;-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.hide{display:none!important}
+header{background:var(--ac);color:#fff;padding:10px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:20}
+header h1{font-size:16px;margin:0;flex:1;font-weight:700}
+header .who{font-size:12px;background:rgba(255,255,255,.18);padding:4px 10px;border-radius:12px}
+header button{background:transparent;border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:6px;padding:4px 10px;font-size:12px}
+nav{display:flex;overflow-x:auto;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:46px;z-index:19}
+nav button{flex:1 0 auto;border:0;background:none;padding:12px 14px;font-weight:600;color:var(--mut);border-bottom:3px solid transparent;white-space:nowrap}
+nav button.on{color:var(--ac);border-bottom-color:var(--ac)}
+nav .bd{display:inline-block;min-width:18px;padding:0 5px;margin-left:4px;background:var(--bad);color:#fff;border-radius:9px;font-size:11px;line-height:18px;text-align:center}
+main{padding:12px;max-width:1280px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px}
+.card h2{font-size:14px;margin:0 0 8px;display:flex;align-items:center;gap:8px}
+.card h2 .sub{font-weight:400;color:var(--mut);font-size:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{background:var(--ac);color:#fff;border:0;border-radius:7px;padding:8px 14px;font-weight:600}
+.btn.sm{padding:5px 10px;font-size:12px}
+.btn.gray{background:#e6ebf2;color:var(--tx)}
+.btn.red{background:var(--bad)}
+.btn.green{background:var(--ok)}
+.btn.line{background:#fff;color:var(--ac);border:1px solid var(--ac)}
+.btn:disabled{opacity:.5}
+input[type=text],input[type=password],input[type=number],input[type=date],select,textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:7px;background:#fff}
+textarea{resize:vertical;min-height:70px}
+label{display:block;font-size:12px;color:var(--mut);margin:10px 0 4px;font-weight:600}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:16px;padding:5px 12px;white-space:nowrap;font-size:12px}
+.chip.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.tbl-wrap{overflow:auto;max-height:calc(100vh - 230px);border:1px solid var(--line);border-radius:8px;background:#fff}
+table.m{border-collapse:separate;border-spacing:0;font-size:13px;width:max-content;min-width:100%}
+table.m th,table.m td{border-bottom:1px solid var(--line);border-right:1px solid #eef1f6;padding:6px 8px;text-align:center;background:#fff}
+table.m thead th{position:sticky;top:0;background:var(--soft);z-index:3;font-size:12px}
+table.m thead tr:nth-child(2) th{top:29px}
+table.m td.nm,table.m th.nm{position:sticky;left:0;text-align:left;min-width:170px;max-width:210px;z-index:2;background:#fff;border-right:2px solid var(--line)}
+table.m thead th.nm{background:var(--soft);z-index:4}
+table.m tr.cat td{background:#f6f8fb;font-weight:700;text-align:left;position:sticky;left:0}
+table.m td.tot{font-weight:700;background:#fafbfd}
+table.m td.z{color:#c3cad6}
+table.m td.me,table.m th.me{background:#fff8e6}
+table.m tbody tr.it{cursor:pointer}
+table.m tbody tr.it:hover td{background:#f2f7ff}
+table.m tfoot td{position:sticky;bottom:0;background:var(--soft);font-weight:700;z-index:2}
+.thumb{width:34px;height:34px;object-fit:cover;border-radius:6px;vertical-align:middle;margin-right:7px;background:#e9edf3}
+.nm small{display:block;color:var(--mut);font-size:11px;margin-left:41px}
+.item{border:1px solid var(--line);border-radius:9px;padding:10px;margin-bottom:8px;background:#fff}
+.item .top{display:flex;gap:10px;align-items:flex-start}
+.item .top img{width:54px;height:54px;object-fit:cover;border-radius:8px;background:#e9edf3;flex:none}
+.item .t{font-weight:700}
+.item .d{font-size:12px;color:var(--mut);margin-top:2px;line-height:1.5}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:11px;font-weight:700;margin-right:4px}
+.tag.p{background:#fff1d6;color:var(--warn)}.tag.d{background:#dff3e6;color:var(--ok)}.tag.r{background:#fde4e4;color:var(--bad)}.tag.c{background:#e8ebf0;color:var(--mut)}.tag.l{background:#e4eefc;color:var(--ac)}
+.empty{color:var(--mut);text-align:center;padding:18px 0;font-size:13px}
+.ov{position:fixed;inset:0;background:rgba(15,25,40,.55);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.md{background:#fff;width:100%;max-width:560px;max-height:92vh;overflow:auto;border-radius:14px 14px 0 0;padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+@media(min-width:700px){.ov{align-items:center}.md{border-radius:14px}}
+.md h3{margin:0 0 6px;font-size:16px}
+.md .photo{width:100%;max-height:300px;object-fit:contain;background:#f0f3f8;border-radius:8px}
+.kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px;margin:8px 0}
+.kv div{background:var(--soft);border-radius:7px;padding:6px 8px;font-size:12px}
+.kv b{display:block;font-size:15px}
+.note{background:#fff8e6;border:1px solid #f3dfa5;border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.55;color:#6c5300}
+.note.blue{background:var(--soft);border-color:#c9daf0;color:#27466f}
+#login{max-width:360px;margin:12vh auto 0;padding:0 16px}
+#login .card{padding:20px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:20px;z-index:99;font-size:13px;max-width:90vw;opacity:0;transition:.25s;pointer-events:none}
+#toast.on{opacity:1}
+pre.rep{white-space:pre-wrap;background:#fafbfc;border:1px solid var(--line);border-radius:8px;padding:12px;font-family:'Malgun Gothic',monospace;font-size:13px;line-height:1.7;margin:0}
+table.r{border-collapse:collapse;font-size:13px}
+table.r th,table.r td{border:1px solid #889;padding:4px 10px;text-align:center}
+table.r th{background:#eef2f8}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="card">
+    <h2 style="font-size:18px;margin-bottom:4px">판촉비품 관리</h2>
+    <div style="color:var(--mut);font-size:12px;margin-bottom:6px">무학 영업지점 판촉비품 현황 · 이동 · 손망실</div>
+    <label>지점</label>
+    <select id="lg-loc">
+      <option>창원</option><option>진주</option><option>김해</option><option>한려</option><option>북부산</option><option>남부산</option><option>울산</option><option>서울</option><option>대구물류</option><option>관리자</option>
+    </select>
+    <label>비밀번호</label>
+    <input type="password" id="lg-pw" autocomplete="current-password" inputmode="text">
+    <button class="btn" id="lg-go" style="width:100%;margin-top:14px;padding:11px">로그인</button>
+    <div id="lg-err" style="color:var(--bad);font-size:12px;margin-top:8px;min-height:16px"></div>
+  </div>
+</div>
+
+<div id="app" class="hide">
+  <header>
+    <h1>판촉비품 관리</h1>
+    <span class="who" id="who"></span>
+    <button id="btn-refresh">새로고침</button>
+    <button id="btn-logout">로그아웃</button>
+  </header>
+  <nav id="nav"></nav>
+  <main id="main"></main>
+</div>
+<div id="toast"></div>
+
+<script>
+'use strict';
+const SB_URL='https://wsktpndhlytjbnunbvxp.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indza3RwbmRobHl0amJudW5idnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMzEyNjMsImV4cCI6MjA5NzkwNzI2M30.RdQM6ovQMoq70h5r0zY-EqArzXfia-P_mZGcFTQoU_c';
+const ADMIN='관리자';
+const ERR={ADMIN_NO_REQ:'관리자 계정은 요청할 수 없습니다. 지점 계정으로 로그인해 주세요.',NO_REQ:'이미 처리된 요청입니다.',NO_STOCK:'해당 지점의 보유 수량이 없습니다.',AUTH_FAIL:'지점 또는 비밀번호가 맞지 않습니다.',STOCK_SHORT:'보유 수량이 부족합니다.',FORBIDDEN:'권한이 없습니다.',NOT_PENDING:'이미 처리된 건입니다. 새로고침해 주세요.',REASON_REQUIRED:'사유를 입력해 주세요.',PHOTO_REQUIRED:'사진을 첨부해 주세요.',PHOTO_TOO_BIG:'사진 용량이 너무 큽니다. 다른 사진을 선택해 주세요.',DUP_NAME:'이미 같은 이름의 품목이 있습니다.',SAME_LOC:'보내는 곳과 받는 곳이 같습니다.',BAD_QTY:'수량을 확인해 주세요.',OVER_RETURN:'반납 수량이 대여 잔량보다 많습니다.',NO_LOAN:'대여 건을 찾을 수 없습니다.',NAME_REQUIRED:'품목명을 입력해 주세요.',BAD_CAT:'분류를 선택해 주세요.',PW_SHORT:'비밀번호는 3자 이상이어야 합니다.',NOT_FOUND:'대상을 찾을 수 없습니다.',BAD_LOC:'보관처를 확인해 주세요.'};
+let ME=null,S=null,STK={},PH={},ITM={},tab='stock',fCat=0,fQ='',fMine=false,busy=false,rep=null,repYm='',logs=null;
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>Number(n||0).toLocaleString('ko-KR');
+const isAdmin=()=>ME&&ME.loc===ADMIN;
+const kstDate=()=>new Date(Date.now()+9*36e5).toISOString().slice(0,10);
+const kstYm=()=>kstDate().slice(0,7);
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2600)}
+function errText(e){const m=String(e&&e.message||e);if(/Failed to fetch|NetworkError|Load failed/i.test(m))return '서버에 연결할 수 없습니다. 잠시 후 다시 시도해 주세요. (계속되면 Supabase 일시중지 여부 확인)';const code=m.split(':')[0].trim();if(code==='PENDING')return '대기 중인 건이 '+m.split(':')[1]+'건 있습니다. 승인 또는 취소 후 월 확정/보고서 생성이 가능합니다.';return ERR[code]||m}
+
+async function rpc(fn,args){
+  const r=await fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(args||{})});
+  const t=await r.text();let j=null;try{j=t?JSON.parse(t):null}catch(e){j=t}
+  if(!r.ok)throw new Error((j&&j.message)||t||('HTTP '+r.status));
+  return j;
+}
+const call=(fn,a)=>rpc(fn,Object.assign({p_loc:ME.loc,p_pw:ME.pw},a||{}));
+async function act(fn,a,okMsg){
+  if(busy)return false;busy=true;
+  try{const r=await call(fn,a);if(okMsg)toast(okMsg);await load();return r===null?true:r}
+  catch(e){toast(errText(e));return false}
+  finally{busy=false}
+}
+
+/* ---------- 데이터 ---------- */
+async function load(){
+  S=await call('sup_state');
+  if(!load.init){load.init=1;fMine=false}
+  STK={};S.stock.forEach(([i,l,q])=>STK[i+'|'+l]=q);
+  ITM={};S.items.forEach(i=>ITM[i.id]=i);
+  if(S.items.some(i=>i.has_photo)&&!load.ph){load.ph=1;call('sup_item_photos').then(p=>{PH=p;load.ph=0;if(!document.querySelector('.ov'))render()}).catch(()=>{load.ph=0})}
+  render();
+}
+const q=(i,l)=>STK[i+'|'+l]||0;
+const total=i=>S.locs.reduce((a,l)=>a+q(i,l.code),0);
+const act_items=()=>S.items.filter(i=>i.active);
+const imgSrc=i=>i.has_photo&&PH[i.id]?PH[i.id]:'photos/'+i.cat_no+'-'+i.item_no+'.jpg';
+const PHOLD="data:image/svg+xml;utf8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60"><rect width="60" height="60" fill="#e9edf3"/><text x="30" y="36" font-size="11" text-anchor="middle" fill="#9aa5b5">사진없음</text></svg>');
+const img=(i,c)=>`<img class="${c||'thumb'}" loading="lazy" src="${esc(imgSrc(i))}" onerror="this.onerror=null;this.src='${PHOLD}'">`;
+const myLocs=()=>isAdmin()?S.locs.map(l=>l.code):[ME.loc];
+const nameOf=id=>ITM[id]?ITM[id].name:'#'+id;
+
+/* ---------- 로그인 ---------- */
+$('#lg-go').onclick=async()=>{
+  const loc=$('#lg-loc').value,pw=$('#lg-pw').value;$('#lg-err').textContent='';
+  if(!pw){$('#lg-err').textContent='비밀번호를 입력해 주세요.';return}
+  $('#lg-go').disabled=true;
+  try{await rpc('sup_login',{p_loc:loc,p_pw:pw});ME={loc,pw};try{sessionStorage.setItem('sup_me',JSON.stringify(ME))}catch(e){}
+    $('#login').classList.add('hide');$('#app').classList.remove('hide');$('#who').textContent=loc;tab='stock';await load()}
+  catch(e){$('#lg-err').textContent=errText(e)}
+  $('#lg-go').disabled=false;
+};
+$('#lg-pw').onkeydown=e=>{if(e.key==='Enter')$('#lg-go').click()};
+$('#btn-logout').onclick=()=>{try{sessionStorage.removeItem('sup_me')}catch(e){}location.reload()};
+$('#btn-refresh').onclick=async()=>{try{await load();toast('새로고침 완료')}catch(e){toast(errText(e))}};
+(async function(){try{const m=JSON.parse(sessionStorage.getItem('sup_me')||'null');if(m){ME=m;await rpc('sup_login',{p_loc:m.loc,p_pw:m.pw});$('#login').classList.add('hide');$('#app').classList.remove('hide');$('#who').textContent=m.loc;await load()}}catch(e){ME=null}})();
+setInterval(()=>{if(ME&&!document.hidden&&!document.querySelector('.ov')&&!busy)load().catch(()=>{})},60000);
+
+/* ---------- 탭 ---------- */
+function pendCounts(){
+  const mv=S.moves.filter(m=>m.status==='pending'),ls=S.losses.filter(l=>l.status==='pending');
+  const rq=(S.reqs||[]).filter(x=>x.status==='open'&&(isAdmin()||x.from_loc===ME.loc)).length;
+  const mine=(isAdmin()?mv.length:mv.filter(m=>m.to_loc===ME.loc).length)+rq;
+  const lmine=isAdmin()?ls.length:0;
+  return{mv:mine,ls:lmine,allMv:mv.length,allLs:ls.length}
+}
+function render(){
+  if(!S)return;
+  const pc=pendCounts();
+  const tabs=[['stock','현황',0],['move','이동·대여',pc.mv],['loss','손망실',pc.ls],['new','신규 등록',0]];
+  if(isAdmin()){tabs.push(['month','월 확정·보고서',0],['admin','관리',0])}
+  $('#nav').innerHTML=tabs.map(([k,n,b])=>`<button class="${tab===k?'on':''}" data-tab="${k}">${n}${b?`<span class="bd">${b}</span>`:''}</button>`).join('');
+  $('#nav').querySelectorAll('button').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render();window.scrollTo(0,0);if(tab==='admin'&&!logs)loadLogs()});
+  const f={stock:vStock,move:vMove,loss:vLoss,new:vNew,month:vMonth,admin:vAdmin}[tab];
+  const sc=$('#main').querySelector('.tbl-wrap');const sl=sc?[sc.scrollLeft,sc.scrollTop]:null;
+  const act=document.activeElement&&document.activeElement.id==='f-q'?document.activeElement.selectionStart:null;
+  $('#main').innerHTML=f();bind();
+  if(sl){const n=$('#main').querySelector('.tbl-wrap');if(n){n.scrollLeft=sl[0];n.scrollTop=sl[1]}}
+  if(act!==null){const el=$('#f-q');if(el){el.focus();el.setSelectionRange(act,act)}}
+}
+
+/* ---------- 현황 ---------- */
+function matrix(opts){
+  opts=opts||{};
+  const get=opts.get||q;
+  const adm=true;
+  const locs=S.locs,grp=[];
+  locs.forEach(l=>{const g=grp.length&&grp[grp.length-1];if(g&&g.n===l.grp)g.c++;else grp.push({n:l.grp,c:1})});
+  const cats=[...new Set(act_items().map(i=>i.cat_no))].sort((a,b)=>a-b);
+  const items=act_items().filter(i=>(!fCat||i.cat_no===fCat)&&(!fQ||i.name.replace(/\s/g,'').toLowerCase().includes(fQ.replace(/\s/g,'').toLowerCase()))&&(!fMine||get(i.id,ME.loc)>0));
+  let h=`<table class="m"><thead><tr><th class="nm" rowspan="2">품목</th>${adm?'<th rowspan="2">합계</th>':''}`+grp.map(g=>`<th colspan="${g.c}">${esc(g.n)}</th>`).join('')+`</tr><tr>`+locs.map(l=>`<th class="${l.code===ME.loc?'me':''}">${esc(l.code)}</th>`).join('')+`</tr></thead><tbody>`;
+  const sums={};locs.forEach(l=>sums[l.code]=0);let all=0;
+  cats.forEach(c=>{const its=items.filter(i=>i.cat_no===c);if(!its.length)return;
+    h+=`<tr class="cat"><td colspan="${locs.length+(adm?2:1)}">${c}. ${esc(its[0].cat_name)}</td></tr>`;
+    its.forEach(i=>{const t=locs.reduce((a,l)=>a+get(i.id,l.code),0);all+=t;
+      h+=`<tr class="it" data-id="${i.id}"><td class="nm">${img(i)}${esc(i.name)}${i.note?`<small>${esc(i.note)}</small>`:''}</td>${adm?`<td class="tot">${fmt(t)}</td>`:''}`+locs.map(l=>{const v=get(i.id,l.code);sums[l.code]+=v;return `<td class="${v?'':'z'} ${l.code===ME.loc?'me':''}">${v?fmt(v):'·'}</td>`}).join('')+`</tr>`});
+  });
+  h+=`</tbody><tfoot><tr><td class="nm" style="background:var(--soft)">합계 (${items.length}종)</td>${adm?`<td>${fmt(all)}</td>`:''}`+locs.map(l=>`<td>${fmt(sums[l.code])}</td>`).join('')+`</tr></tfoot></table>`;
+  return h;
+}
+function vStock(){
+  const cats=[...new Map(act_items().map(i=>[i.cat_no,i.cat_name]))];
+  return `<div class="card"><div class="row" style="margin-bottom:8px">
+    <input type="text" id="f-q" placeholder="품목 검색" value="${esc(fQ)}" style="flex:1;min-width:140px">
+    <label style="margin:0;display:flex;gap:5px;align-items:center;color:var(--tx)"><input type="checkbox" id="f-mine" ${fMine?'checked':''}>우리 지점 보유만</label>
+  </div>
+  <div class="chips"><button class="chip ${fCat?'':'on'}" data-cat="0">전체</button>${cats.map(([n,t])=>`<button class="chip ${fCat===n?'on':''}" data-cat="${n}">${n}.${esc(t)}</button>`).join('')}</div>
+  <div class="empty hide"></div></div>
+  <div class="tbl-wrap">${matrix()}</div>
+  <div style="color:var(--mut);font-size:12px;margin-top:8px">${isAdmin()?'품목을 누르면 사진·보관처별 수량과 이동/손망실 신고 메뉴가 열립니다.':'전 지점 보유 현황을 볼 수 있습니다(내 지점 강조). 필요한 물품이 다른 지점에 있으면 품목을 눌러 보유 지점을 확인하고, 해당 지점에 이동·대여를 요청해 주세요.'} (단위: EA)</div>`;
+}
+
+/* ---------- 모달 ---------- */
+function modal(html,onMount){
+  closeModal();
+  const o=document.createElement('div');o.className='ov';o.innerHTML=`<div class="md">${html}</div>`;
+  o.addEventListener('mousedown',e=>{if(e.target===o)closeModal()});
+  document.body.appendChild(o);if(onMount)onMount(o.querySelector('.md'));
+}
+function closeModal(){document.querySelectorAll('.ov').forEach(o=>o.remove())}
+function itemModal(id){
+  const i=ITM[id];const rows=S.locs.filter(l=>q(id,l.code)>0);
+  const mine=isAdmin()?total(id):q(id,ME.loc);const others=rows.filter(l=>l.code!==ME.loc).length;
+  modal(`${img(i,'photo')}<h3 style="margin-top:10px">${esc(i.name)}</h3>
+   <div style="color:var(--mut);font-size:12px">${i.cat_no}-${i.item_no} · ${esc(i.cat_name)}${i.note?' · '+esc(i.note):''}</div>
+   <div class="kv">${isAdmin()?`<div>합계<b>${fmt(total(id))}</b></div>`:`<div>전체 합계<b>${fmt(total(id))}</b></div>`}${rows.map(l=>`<div>${esc(l.code)}${l.code===ME.loc?' (우리)':''}<b>${fmt(q(id,l.code))}</b></div>`).join('')}</div>
+   <div class="row" style="margin-top:6px">
+    ${mine>0?`<button class="btn" data-a="move">이동·대여</button><button class="btn line" data-a="loss">손망실 신고</button>`:''}
+    ${!isAdmin()&&rows.some(l=>l.code!==ME.loc)?`<button class="btn green" data-a="req">이 물품 필요합니다</button>`:''}
+    <button class="btn gray" data-a="adj">수량 조정</button>
+    <button class="btn gray" data-a="close">닫기</button></div>
+   ${mine>0?'':'<div class="empty" style="padding:8px">우리 지점에 보유 수량이 없어 이동·손망실 신고는 할 수 없습니다.</div>'}`,m=>{
+    m.querySelector('[data-a=close]').onclick=closeModal;
+    const a=(n,f)=>{const b=m.querySelector(`[data-a=${n}]`);if(b)b.onclick=f};
+    a('move',()=>moveForm(id));a('req',()=>reqForm(id));a('loss',()=>lossForm(id));a('adj',()=>adjForm(id));
+  });
+}
+function locSel(id,cur,withAll){return `<select id="${id}">${S.locs.map(l=>`<option ${l.code===cur?'selected':''}>${esc(l.code)}</option>`).join('')}</select>`}
+function itemOpts(loc,sel){return act_items().filter(i=>q(i.id,loc)>0).map(i=>`<option value="${i.id}" ${i.id===sel?'selected':''}>${esc(i.name)} (${fmt(q(i.id,loc))})</option>`).join('')}
+
+function moveForm(itemId,pre){
+  const def=pre&&pre.from?pre.from:isAdmin()?(itemId?(S.locs.find(l=>q(itemId,l.code)>0)||S.locs[0]).code:S.locs[0].code):ME.loc;
+  modal(`<h3>이동 · 대여 등록</h3>
+  <div class="note blue">받는 곳이 확인하면 그때 수량이 옮겨집니다. 확인 전에는 "대기" 상태입니다.</div>
+  <label>구분</label><div class="row"><label style="margin:0;color:var(--tx)"><input type="radio" name="mk" value="perm" checked> 영구 이동</label><label style="margin:0;color:var(--tx)"><input type="radio" name="mk" value="loan"> 임시 대여(반납 예정)</label></div>
+  <label>보내는 곳</label>${isAdmin()?locSel('mv-from',def):`<input type="text" value="${esc(ME.loc)}" disabled>`}
+  <label>품목</label><select id="mv-item"></select>
+  <label>받는 곳</label><select id="mv-to"></select>
+  <div class="grid2"><div><label>수량</label><input type="number" id="mv-qty" min="1" value="1" inputmode="numeric"></div><div id="mv-duew" class="hide"><label>반납 예정일</label><input type="date" id="mv-due"></div></div>
+  <label>메모 (행사명 등)</label><input type="text" id="mv-memo" maxlength="100">
+  <div class="row" style="margin-top:14px"><button class="btn" id="mv-ok">등록</button><button class="btn gray" id="mv-x">취소</button></div>`,m=>{
+    const from=()=>isAdmin()?m.querySelector('#mv-from').value:ME.loc;
+    const refill=()=>{const f=from();m.querySelector('#mv-item').innerHTML=itemOpts(f,itemId)||'<option value="">보유 품목 없음</option>';
+      m.querySelector('#mv-to').innerHTML=S.locs.filter(l=>l.code!==f).map(l=>`<option ${pre&&pre.to===l.code?'selected':''}>${esc(l.code)}</option>`).join('')};
+    refill();if(pre){if(pre.qty)m.querySelector('#mv-qty').value=pre.qty;m.querySelector('#mv-memo').value=pre.memo||''}
+    if(isAdmin())m.querySelector('#mv-from').onchange=refill;
+    m.querySelectorAll('[name=mk]').forEach(r=>r.onchange=()=>m.querySelector('#mv-duew').classList.toggle('hide',m.querySelector('[name=mk]:checked').value!=='loan'));
+    m.querySelector('#mv-x').onclick=closeModal;
+    m.querySelector('#mv-ok').onclick=async()=>{
+      const it=+m.querySelector('#mv-item').value,qty=+m.querySelector('#mv-qty').value,kind=m.querySelector('[name=mk]:checked').value;
+      if(!it)return toast('이동할 품목을 선택해 주세요.');if(!(qty>0))return toast('수량을 입력해 주세요.');
+      if(qty>q(it,from()))return toast('보유 수량('+fmt(q(it,from()))+')보다 많습니다.');
+      const ok=await act('sup_move_create',{p_kind:kind,p_item:it,p_from:from(),p_to:m.querySelector('#mv-to').value,p_qty:qty,p_memo:m.querySelector('#mv-memo').value,p_due:kind==='loan'?(m.querySelector('#mv-due').value||null):null,p_loan:null},'등록했습니다. 받는 곳의 확인을 기다립니다.');
+      if(ok){if(pre&&pre.req){try{await call('sup_req_resolve',{p_id:pre.req,p_action:'done',p_reason:null});await load()}catch(e){}}closeModal();tab='move';render()}
+    };
+  });
+}
+function reqForm(itemId){
+  const hs=S.locs.filter(l=>l.code!==ME.loc&&q(itemId,l.code)>0);
+  modal(`<h3>이 물품 필요합니다</h3><div class="note blue">${esc(nameOf(itemId))} — 보유 지점에 요청이 전달됩니다. 보유 지점이 이동·대여를 등록하면 우리 지점이 수령 확인 후 반영됩니다.</div>
+  <label>보유 지점</label><select id="rq-from">${hs.map(l=>`<option value="${esc(l.code)}">${esc(l.code)} (보유 ${fmt(q(itemId,l.code))})</option>`).join('')}</select>
+  <label>필요 수량</label><input type="number" id="rq-qty" min="1" value="1" inputmode="numeric">
+  <label>용도·시기 (행사명, 필요일 등)</label><input type="text" id="rq-memo" maxlength="100">
+  <div class="row" style="margin-top:14px"><button class="btn" id="rq-ok">요청 보내기</button><button class="btn gray" id="rq-x">취소</button></div>`,m=>{
+    m.querySelector('#rq-x').onclick=closeModal;
+    m.querySelector('#rq-ok').onclick=async()=>{const n=+m.querySelector('#rq-qty').value;if(!(n>0))return toast('수량을 입력해 주세요.');
+      const ok=await act('sup_req_create',{p_item:itemId,p_from:m.querySelector('#rq-from').value,p_qty:n,p_memo:m.querySelector('#rq-memo').value},'요청을 보냈습니다. 보유 지점의 처리를 기다립니다.');if(ok){closeModal();tab='move';render()}};
+  });
+}
+function reqCard(x){
+  const i=ITM[x.item_id]||{name:'#'+x.item_id,cat_no:0,item_no:0};
+  const open=x.status==='open',canH=open&&(isAdmin()||ME.loc===x.from_loc),canC=open&&(isAdmin()||ME.loc===x.req_loc);
+  const st={open:'<span class="tag p">요청중</span>',done:'<span class="tag d">처리됨</span>',rejected:'<span class="tag r">불가</span>',cancelled:'<span class="tag c">취소</span>'}[x.status]||'';
+  return `<div class="item"><div class="top">${ITM[x.item_id]?img(i,''):''}<div style="flex:1"><div class="t">${esc(i.name)} <span style="font-weight:400">× ${fmt(x.qty)}</span></div>
+   <div class="d">${st}<b>${esc(x.req_loc)}</b> 필요 → ${esc(x.from_loc)} 보유${x.memo?' · '+esc(x.memo):''}<br>${dt(x.created_at)} 요청${x.reject_reason?`<br><span style="color:var(--bad)">불가 사유: ${esc(x.reject_reason)}</span>`:''}</div></div></div>
+   ${(canH||canC)?`<div class="row" style="margin-top:8px">${canH?`<button class="btn sm green" data-rq="go" data-id="${x.id}">이동·대여 등록</button><button class="btn sm red" data-rq="reject" data-id="${x.id}">불가</button>`:''}${canC?`<button class="btn sm gray" data-rq="cancel" data-id="${x.id}">요청 취소</button>`:''}</div>`:''}</div>`;
+}
+function returnForm(loanId){
+  const ln=S.moves.find(m=>m.id===loanId);const left=ln.qty-ln.returned_qty;
+  modal(`<h3>반납 받음</h3><div class="note blue">${esc(nameOf(ln.item_id))} · ${esc(ln.to_loc)}에서 ${esc(ln.from_loc)}(으)로 돌려받은 수량을 입력합니다. 저장하면 바로 수량에 반영됩니다.</div>
+  <label>돌려받은 수량 (대여 잔량 ${fmt(left)})</label><input type="number" id="rt-qty" min="1" max="${left}" value="${left}" inputmode="numeric">
+  <label>메모</label><input type="text" id="rt-memo" maxlength="100">
+  <div class="row" style="margin-top:14px"><button class="btn" id="rt-ok">반납 받음 저장</button><button class="btn gray" id="rt-x">취소</button></div>`,m=>{
+    m.querySelector('#rt-x').onclick=closeModal;
+    m.querySelector('#rt-ok').onclick=async()=>{const n=+m.querySelector('#rt-qty').value;if(!(n>0&&n<=left))return toast('반납 수량을 확인해 주세요.');
+      const ok=await act('sup_loan_receive',{p_loan:loanId,p_qty:n,p_memo:m.querySelector('#rt-memo').value},'반납을 받았습니다. 수량이 반영되었습니다.');if(ok)closeModal()};
+  });
+}
+function adjForm(itemId){
+  const def=isAdmin()?(S.locs.find(l=>q(itemId,l.code)>0)||S.locs[0]).code:ME.loc;
+  modal(`<h3>수량 조정 (실사)</h3><div class="note">${esc(nameOf(itemId))} — 실제 보유 수량과 다를 때 맞춥니다.${isAdmin()?'':' 사유가 필수이며 변경 이력이 남습니다.'}</div>
+  <label>보관처</label>${isAdmin()?locSel('aj-loc',def):`<input type="text" value="${esc(ME.loc)}" disabled>`}
+  <div class="grid2"><div><label>현재 수량</label><input type="text" id="aj-cur" disabled></div><div><label>조정 후 수량</label><input type="number" id="aj-new" min="0" inputmode="numeric"></div></div>
+  <label>사유${isAdmin()?' (선택)':''}</label><input type="text" id="aj-why" maxlength="100">
+  <div class="row" style="margin-top:14px"><button class="btn" id="aj-ok">저장</button><button class="btn gray" id="aj-x">취소</button></div>`,m=>{
+    const loc=()=>isAdmin()?m.querySelector('#aj-loc').value:ME.loc;
+    const fill=()=>{const c=q(itemId,loc());m.querySelector('#aj-cur').value=c;m.querySelector('#aj-new').value=c};fill();
+    if(isAdmin())m.querySelector('#aj-loc').onchange=fill;
+    m.querySelector('#aj-x').onclick=closeModal;
+    m.querySelector('#aj-ok').onclick=async()=>{const n=m.querySelector('#aj-new').value;if(n===''||+n<0)return toast('수량을 입력해 주세요.');
+      if(!isAdmin()&&!m.querySelector('#aj-why').value.trim())return toast('사유를 입력해 주세요.');
+      const ok=await act('sup_adjust',{p_item:itemId,p_at:loc(),p_new:+n,p_reason:m.querySelector('#aj-why').value},'수량을 조정했습니다.');if(ok)closeModal()};
+  });
+}
+
+/* ---------- 이동·대여 ---------- */
+const kindTxt={perm:'영구 이동',loan:'임시 대여',return:'반납'};
+const stTag={pending:'<span class="tag p">대기</span>',done:'<span class="tag d">완료</span>',rejected:'<span class="tag r">거절</span>',cancelled:'<span class="tag c">취소</span>'};
+const dt=s=>s?new Date(s).toLocaleString('ko-KR',{timeZone:'Asia/Seoul',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}):'';
+function moveCard(m,opts){
+  const i=ITM[m.item_id]||{name:'#'+m.item_id,cat_no:0,item_no:0};
+  const canConf=m.status==='pending'&&(isAdmin()||ME.loc===m.to_loc);
+  const canCancel=m.status==='pending'&&(isAdmin()||ME.loc===m.from_loc||ME.loc===m.created_by);
+  const left=m.qty-m.returned_qty;
+  const canRet=opts&&opts.loan&&(isAdmin()||ME.loc===m.from_loc);
+  return `<div class="item"><div class="top">${ITM[m.item_id]?img(i,''):''}<div style="flex:1">
+   <div class="t">${esc(i.name)} <span style="font-weight:400">× ${fmt(m.qty)}</span></div>
+   <div class="d">${stTag[m.status]||''}<span class="tag l">${kindTxt[m.kind]}</span> ${esc(m.from_loc)} → <b>${esc(m.to_loc)}</b>${m.memo?' · '+esc(m.memo):''}<br>
+    ${dt(m.created_at)} 등록(${esc(m.created_by||'')})${m.resolved_at?' · '+dt(m.resolved_at)+' 처리('+esc(m.resolved_by||'')+')':''}
+    ${m.kind==='loan'&&m.status==='done'?`<br>대여 잔량 <b>${fmt(left)}</b>${m.returned_qty?` (반납 ${fmt(m.returned_qty)})`:''}${m.due_date?' · 반납예정 '+esc(m.due_date):''}`:''}
+    ${m.reject_reason?`<br><span style="color:var(--bad)">거절 사유: ${esc(m.reject_reason)}</span>`:''}</div></div></div>
+   ${(canConf||canCancel||canRet)?`<div class="row" style="margin-top:8px">
+     ${canConf?`<button class="btn sm green" data-mv="confirm" data-id="${m.id}">${isAdmin()&&ME.loc!==m.to_loc?'확인(관리자 승인)':'수령 확인'}</button><button class="btn sm red" data-mv="reject" data-id="${m.id}">거절</button>`:''}
+     ${canCancel?`<button class="btn sm gray" data-mv="cancel" data-id="${m.id}">취소</button>`:''}
+     ${canRet?`<button class="btn sm line" data-mv="return" data-id="${m.id}">반납 받음</button>`:''}</div>`:''}</div>`;
+}
+function vMove(){
+  const mv=S.moves,mine=l=>isAdmin()||l.from_loc===ME.loc||l.to_loc===ME.loc;
+  const pend=mv.filter(m=>m.status==='pending'&&mine(m));
+  const toMe=pend.filter(m=>isAdmin()||m.to_loc===ME.loc),byMe=pend.filter(m=>!toMe.includes(m));
+  const loans=mv.filter(m=>m.kind==='loan'&&m.status==='done'&&m.qty>m.returned_qty);
+  const hist=mv.filter(m=>m.status!=='pending'&&!(m.kind==='loan'&&m.status==='done'&&m.qty>m.returned_qty)).slice(0,40);
+  const sec=(t,list,sub,opts)=>`<div class="card"><h2>${t} <span class="sub">${sub||''}</span></h2>${list.length?list.map(m=>moveCard(m,opts)).join(''):'<div class="empty">없음</div>'}</div>`;
+  const rqs=S.reqs||[],rOpenIn=rqs.filter(x=>x.status==='open'&&(isAdmin()||x.from_loc===ME.loc)),rOpenOut=rqs.filter(x=>x.status==='open'&&!rOpenIn.includes(x)),rDone=rqs.filter(x=>x.status!=='open').slice(0,20);
+  const rsec=(t,list,sub)=>list.length?`<div class="card"><h2>${t} <span class="sub">${sub||''}</span></h2>${list.map(reqCard).join('')}</div>`:'';
+  return `<div class="row" style="margin-bottom:10px"><button class="btn" id="mv-new">+ 이동 · 대여 등록</button></div>`+
+   rsec('요청 받은 건',rOpenIn,isAdmin()?'전체 요청 · 보유 지점이 처리합니다':'다른 지점이 우리 보유 물품을 필요로 합니다')+
+   (isAdmin()?'':rsec('내가 보낸 요청',rOpenOut,'보유 지점 처리 대기 중'))+
+   sec('확인할 건 (대기)',toMe,isAdmin()?'전체 대기 건 · 관리자는 강제 승인/취소 가능':'우리 지점이 받는 건')+
+   (isAdmin()?'':sec('내가 보낸 대기 건',byMe,'받는 곳 확인 대기 중'))+
+   sec('대여 중 (반납 전)',loans,isAdmin()?'전체 · 반납은 빌려준 지점이 "반납 받음"으로 확인':'우리 지점이 빌려준 건 · 돌려받으면 "반납 받음"을 눌러 주세요',{loan:1})+
+   sec('최근 이력',hist,'최근 45일')+rsec('최근 요청 이력',rDone,'최근 30일');
+}
+
+/* ---------- 손망실 ---------- */
+async function compress(file,max,qual){
+  const url=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file)});
+  const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url});
+  const k=Math.min(1,max/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);
+  const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
+  let out=c.toDataURL('image/jpeg',qual);if(out.length>600000)out=c.toDataURL('image/jpeg',.5);return out;
+}
+function photoField(id){return `<label>사진</label><input type="file" id="${id}" accept="image/*"><img id="${id}-pv" class="hide" style="max-width:100%;max-height:200px;margin-top:6px;border-radius:8px">`}
+function photoBind(m,id,max,store){m.querySelector('#'+id).onchange=async e=>{const f=e.target.files[0];if(!f){store.v='';return}try{store.v=await compress(f,max,.7);const p=m.querySelector('#'+id+'-pv');p.src=store.v;p.classList.remove('hide')}catch(x){toast('사진을 읽을 수 없습니다.');store.v=''}}}
+function lossForm(itemId){
+  const def=isAdmin()?(itemId?(S.locs.find(l=>q(itemId,l.code)>0)||S.locs[0]).code:S.locs[0].code):ME.loc;const ph={v:''};
+  modal(`<h3>손망실 신고</h3>
+  <div class="note"><b>손실</b>=파손·훼손으로 사용 불가, <b>망실</b>=분실. 관리자(마케팅팀)가 확인하면 수량이 차감되고, <b>첨부 사진은 확인 즉시 삭제</b>됩니다. 확인 전에는 수량이 유지됩니다.</div>
+  <label>보관처</label>${isAdmin()?locSel('ls-loc',def):`<input type="text" value="${esc(ME.loc)}" disabled>`}
+  <label>품목</label><select id="ls-item"></select>
+  <div class="grid2"><div><label>구분</label><select id="ls-kind"><option value="loss">손실(파손·훼손)</option><option value="lost">망실(분실)</option></select></div><div><label>수량</label><input type="number" id="ls-qty" min="1" value="1" inputmode="numeric"></div></div>
+  <label>발생일</label><input type="date" id="ls-date" value="${kstDate()}">
+  <label>사유 · 경위</label><textarea id="ls-why" maxlength="300" placeholder="예) 행사 중 파손, 운송 중 분실 등"></textarea>
+  <div id="ls-ph">${photoField('ls-file')}<div style="font-size:11px;color:var(--mut);margin-top:4px">파손(손실)은 증빙 사진이 필요합니다. 자동으로 작게 줄여 올라갑니다.</div></div>
+  <div class="row" style="margin-top:14px"><button class="btn red" id="ls-ok">신고</button><button class="btn gray" id="ls-x">취소</button></div>`,m=>{
+    const loc=()=>isAdmin()?m.querySelector('#ls-loc').value:ME.loc;
+    const refill=()=>m.querySelector('#ls-item').innerHTML=itemOpts(loc(),itemId)||'<option value="">보유 품목 없음</option>';refill();
+    if(isAdmin())m.querySelector('#ls-loc').onchange=refill;photoBind(m,'ls-file',900,ph);
+    m.querySelector('#ls-x').onclick=closeModal;
+    m.querySelector('#ls-ok').onclick=async()=>{
+      const it=+m.querySelector('#ls-item').value,n=+m.querySelector('#ls-qty').value,kind=m.querySelector('#ls-kind').value,why=m.querySelector('#ls-why').value.trim();
+      if(!it)return toast('품목을 선택해 주세요.');if(!(n>0))return toast('수량을 입력해 주세요.');if(n>q(it,loc()))return toast('보유 수량('+fmt(q(it,loc()))+')보다 많습니다.');
+      if(!why)return toast('사유를 입력해 주세요.');if(kind==='loss'&&!ph.v)return toast('파손 건은 사진을 첨부해 주세요.');
+      const ok=await act('sup_loss_create',{p_item:it,p_at:loc(),p_kind:kind,p_qty:n,p_reason:why,p_date:m.querySelector('#ls-date').value,p_photo:ph.v||null},'신고했습니다. 관리자 확인 후 반영됩니다.');
+      if(ok){closeModal();tab='loss';render()}
+    };
+  });
+}
+function lossCard(l){
+  const i=ITM[l.item_id]||{name:'#'+l.item_id};
+  const canAdm=l.status==='pending'&&isAdmin(),canCancel=l.status==='pending'&&(isAdmin()||ME.loc===l.loc);
+  return `<div class="item"><div class="top">${ITM[l.item_id]?img(i,''):''}<div style="flex:1"><div class="t">${esc(i.name)} <span style="font-weight:400">× ${fmt(l.qty)}</span></div>
+   <div class="d">${stTag[l.status]||''}<span class="tag ${l.kind==='lost'?'r':'l'}">${l.kind==='lost'?'망실':'손실'}</span> ${esc(l.loc)} · 발생 ${esc(l.occurred_on||'')}<br>${esc(l.reason||'')}<br>
+   ${dt(l.created_at)} 신고(${esc(l.created_by||'')})${l.resolved_at?' · '+dt(l.resolved_at)+' 처리':''}${l.reject_reason?`<br><span style="color:var(--bad)">반려 사유: ${esc(l.reject_reason)}</span>`:''}</div></div></div>
+   ${(l.has_photo||canAdm||canCancel)?`<div class="row" style="margin-top:8px">${l.has_photo?`<button class="btn sm line" data-ls="photo" data-id="${l.id}">사진 보기</button>`:''}
+   ${canAdm?`<button class="btn sm green" data-ls="confirm" data-id="${l.id}">확인(수량 차감·사진 삭제)</button><button class="btn sm red" data-ls="reject" data-id="${l.id}">반려</button>`:''}
+   ${canCancel?`<button class="btn sm gray" data-ls="cancel" data-id="${l.id}">신고 취소</button>`:''}</div>`:''}</div>`;
+}
+function vLoss(){
+  const mine=l=>isAdmin()||l.loc===ME.loc;
+  const pend=S.losses.filter(l=>l.status==='pending'&&mine(l)),hist=S.losses.filter(l=>l.status!=='pending'&&mine(l)).slice(0,40);
+  return `<div class="row" style="margin-bottom:10px"><button class="btn red" id="ls-new">+ 손망실 신고</button></div>
+  <div class="card"><h2>확인 대기 <span class="sub">${isAdmin()?'관리자가 점검 후 확인하면 수량이 차감됩니다':'관리자(마케팅팀) 점검 대기 중'}</span></h2>${pend.length?pend.map(lossCard).join(''):'<div class="empty">없음</div>'}</div>
+  <div class="card"><h2>처리 내역 <span class="sub">최근 90일 · 사진은 처리 후 삭제됨</span></h2>${hist.length?hist.map(lossCard).join(''):'<div class="empty">없음</div>'}</div>`;
+}
+
+/* ---------- 신규 등록 ---------- */
+function vNew(){
+  const cats=[...new Map(S.items.map(i=>[i.cat_no,i.cat_name]))].sort((a,b)=>a[0]-b[0]);
+  return `<div class="card"><h2>신규 비품 등록</h2>
+  <div class="note">단가 <b>3만원 이상</b>의 1회성 소모품이 아닌 비품만 등록합니다 (구매 직후, 승인기안 및 지점장 승인 필요). 제품 사진 첨부 필수. 등록한 수량은 선택한 보관처에 바로 반영되며 월 보고서의 "신규 등록"에 자동 집계됩니다.</div>
+  <label>분류</label><select id="nw-cat">${cats.map(([n,t])=>`<option value="${n}">${n}. ${esc(t)}</option>`).join('')}${isAdmin()?'<option value="0">+ 새 분류 추가</option>':''}</select>
+  <div id="nw-newcat" class="hide"><label>새 분류 이름</label><input type="text" id="nw-catname" maxlength="20"></div>
+  <label>품목명</label><input type="text" id="nw-name" maxlength="60">
+  <div class="grid2"><div><label>수량</label><input type="number" id="nw-qty" min="1" value="1" inputmode="numeric"></div><div><label>보관처</label>${isAdmin()?locSel('nw-loc',S.locs[0].code):`<input type="text" value="${esc(ME.loc)}" disabled>`}</div></div>
+  ${photoField('nw-file')}
+  <div class="row" style="margin-top:14px"><button class="btn" id="nw-ok">등록</button></div></div>`;
+}
+
+/* ---------- 월 확정·보고서 ---------- */
+function vMonth(){
+  const ym=repYm||kstYm();const done=S.months.includes(ym);
+  const pc=pendCounts();
+  return `<div class="card"><h2>월 확정</h2>
+   <div class="row"><input type="month" id="mo-ym" value="${esc(ym)}" style="width:auto"><button class="btn" id="mo-do">${done?'다시 확정':'월 확정'} + 보고서 생성</button>${done?'<button class="btn line" id="mo-view">저장된 보고서 보기</button>':''}</div>
+   ${pc.allMv+pc.allLs?`<div class="note" style="margin-top:10px">⚠ 대기 중인 건이 있어 보고서를 만들 수 없습니다. 이동 대기 <b>${pc.allMv}</b>건, 손망실 대기 <b>${pc.allLs}</b>건을 승인 또는 취소해 주세요.</div>`:''}
+   <div style="color:var(--mut);font-size:12px;margin-top:8px">확정 월: ${S.months.length?S.months.join(', '):'없음'} · 확정하면 그 시점의 지점별 수량이 월 기록으로 저장됩니다.</div></div>
+   <div id="rep-area">${rep?reportHTML():''}</div>`;
+}
+function monthLabel(ym){return (+ym.slice(5))+'월'}
+function sumBy(list,f){const m=new Map();list.forEach(x=>{const k=f(x);m.set(k,(m.get(k)||0)+x.qty)});return m}
+function reportText(r){
+  const ml=monthLabel(r.ym),L=[];
+  const nw=r.new||[],ls=r.loss||[];
+  const nwN=sumBy(nw,x=>x.name),lsN=sumBy(ls,x=>x.name);
+  const nwTxt=nw.length?`${nwN.size}종 ${fmt(nw.reduce((a,x)=>a+x.qty,0))}개 (`+nw.map(x=>`${x.loc} ${x.name} ${fmt(x.qty)}개`).join(', ')+')':'없음';
+  const lsTxt=ls.length?`${lsN.size}종 `+[...lsN].map(([n,q])=>`${n} ${fmt(q)}개`).join(', '):'없음';
+  L.push(`1. ${ml} 판촉비품 관리 결과`,' 가. 관리 품목 및 수량',`   1) 기존 등록 : ${r.prev_kinds!=null?r.prev_kinds+'종 '+fmt(r.prev_qty)+'개':'-'}`,`   2) 신규 등록 : ${nwTxt}`,`   3) 손  망  실 : ${lsTxt}`);
+  if(r.adjust)L.push(`   ※ 실사 조정 : ${r.adjust>0?'+':''}${fmt(r.adjust)}개`);
+  L.push(`   4) 합       계 : ${r.kinds}종 ${fmt(r.qty)}개`,' 나. 종류별 품목 수량 현황 (표 참조)','','2. 공유 비품 이동 현황 (추적 관리)');
+  const mv=r.moves||[];
+  if(mv.length){const ab='가나다라마바사아자차카타파하';mv.forEach((m,i)=>{
+    const t=m.kind==='return'?`${m.from} ${m.name} ${fmt(m.qty)}개 ▶ ${m.to} 반납`:`${m.from} ${m.name} ${fmt(m.qty)}개 ▶ ${m.to} ${m.kind==='loan'?'대여':'이동'}`;
+    L.push(` ${ab[i]||'-'}. ${t}${m.memo?' ('+m.memo+')':''}`)})}else L.push(' 해당 없음');
+  const ol=r.open_loans||[];
+  if(ol.length){L.push('','3. 대여 중 (반납 전)');ol.forEach(o=>L.push(` - ${o.from} ${o.name} ${fmt(o.qty)}개 ▶ ${o.to} 대여 중${o.due?' (반납예정 '+o.due+')':''}`))}
+  return L.join('\n');
+}
+function catTableHTML(r){
+  const c=r.cats||[],h=Math.ceil(c.length/2);let t=`<table class="r"><tr><th>일련</th><th>구 분</th><th>수 량</th><th>일련</th><th>구 분</th><th>수량</th></tr>`;
+  for(let i=0;i<h;i++){const a=c[i],b=c[i+h];t+=`<tr><td>${a.cat_no}</td><td>${esc(a.cat_name)}</td><td>${fmt(a.qty)}</td>`+(b?`<td>${b.cat_no}</td><td>${esc(b.cat_name)}</td><td>${fmt(b.qty)}</td>`:`<td colspan="2">합계</td><td>${fmt(r.qty)}</td>`)+`</tr>`}
+  if(c.length%2===0)t+=`<tr><td colspan="5">합계</td><td>${fmt(r.qty)}</td></tr>`;
+  return t+'</table>';
+}
+function catTableTSV(r){
+  const c=r.cats||[],h=Math.ceil(c.length/2);const L=['일련\t구분\t수량\t일련\t구분\t수량'];
+  for(let i=0;i<h;i++){const a=c[i],b=c[i+h];L.push(`${a.cat_no}\t${a.cat_name}\t${a.qty}\t`+(b?`${b.cat_no}\t${b.cat_name}\t${b.qty}`:`\t합계\t${r.qty}`))}
+  if(c.length%2===0)L.push(`\t\t\t\t합계\t${r.qty}`);return L.join('\n');
+}
+function reportHTML(){
+  return `<div class="card"><h2>${monthLabel(rep.ym)} 보고서 <span class="sub">한글 2002 등에 붙여넣기</span></h2>
+   <pre class="rep" id="rp-text">${esc(reportText(rep))}</pre>
+   <div class="row" style="margin-top:8px"><button class="btn sm" data-cp="text">문안 복사</button></div>
+   <h2 style="margin-top:16px">종류별 품목 수량 현황 <span class="sub">(단위 : ea)</span></h2>
+   <div style="overflow:auto">${catTableHTML(rep)}</div>
+   <div class="row" style="margin-top:8px"><button class="btn sm" data-cp="cat">표 복사 (탭 구분)</button><button class="btn sm line" data-cp="cathtml">표 복사 (서식 포함)</button></div>
+   <h2 style="margin-top:16px">지점별 비품 집계표 <span class="sub">별첨용 · 확정 시점 수량</span></h2>
+   <div class="row"><button class="btn sm" data-cp="matrix">집계표 복사 (탭 구분)</button></div></div>`;
+}
+async function copyText(t,html){
+  try{if(html&&window.ClipboardItem){await navigator.clipboard.write([new ClipboardItem({'text/plain':new Blob([t],{type:'text/plain'}),'text/html':new Blob([html],{type:'text/html'})})])}else await navigator.clipboard.writeText(t);toast('복사했습니다.')}
+  catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('복사했습니다.')}catch(x){toast('복사에 실패했습니다.')}ta.remove()}
+}
+function matrixTSV(snap){
+  const g={};snap.forEach(([i,l,v])=>g[i+'|'+l]=v);const locs=S.locs.map(l=>l.code);
+  const L=['일련\t구분\t품목\t합계\t'+locs.join('\t')];
+  act_items().forEach(i=>{const row=locs.map(l=>g[i.id+'|'+l]||0);L.push([i.cat_no+'-'+i.item_no,i.cat_name,i.name,row.reduce((a,b)=>a+b,0),...row.map(v=>v||'')].join('\t'))});
+  return L.join('\n');
+}
+
+/* ---------- 관리 ---------- */
+async function loadLogs(){try{logs=await call('sup_log_list',{p_limit:200});if(tab==='admin')render()}catch(e){toast(errText(e))}}
+const actTxt={req_create:'물품 요청',req_done:'요청 처리',req_reject:'요청 불가',req_cancel:'요청 취소',item_new:'신규 등록',item_edit:'품목 수정',adjust:'수량 조정',month_confirm:'월 확정',set_pw:'비번 변경',loss_reject:'손망실 반려',loss_cancel:'손망실 취소',move_reject:'이동 거절',move_cancel:'이동 취소'};
+function actName(a){if(actTxt[a])return actTxt[a];const [k,s]=a.split(':');const m={move_create:'이동 등록',move_done:'이동 완료',loss_create:'손망실 신고',loss_done:'손망실 확정'}[k];return m?m+(s?'('+({perm:'영구',loan:'대여','return':'반납',loss:'손실',lost:'망실'}[s]||s)+')':''):a}
+function vAdmin(){
+  const br=S.locs.filter(l=>l.login);
+  return `<div class="card"><h2>지점 비밀번호 변경</h2><div class="grid2" style="gap:10px">${br.map(l=>`<div class="item" style="margin:0"><b>${esc(l.code)}</b><div class="row" style="margin-top:6px;flex-wrap:nowrap"><input type="text" placeholder="새 비밀번호" data-pwin="${esc(l.code)}"><button class="btn sm" data-pw="${esc(l.code)}">변경</button></div></div>`).join('')}</div>
+   <div class="row" style="margin-top:12px"><button class="btn line sm" id="pw-admin">관리자 비밀번호 변경</button></div></div>
+  <div class="card"><h2>품목 관리 <span class="sub">이름·사진·메모 수정, 사용 중지</span></h2>
+   ${S.items.map(i=>`<div class="item" style="margin-bottom:6px"><div class="top">${img(i,'')}<div style="flex:1"><div class="t">${i.cat_no}-${i.item_no} ${esc(i.name)} ${i.active?'':'<span class="tag c">사용중지</span>'}</div><div class="d">${esc(i.cat_name)} · 합계 ${fmt(total(i.id))}${i.note?' · '+esc(i.note):''}</div></div><button class="btn sm gray" data-edit="${i.id}">수정</button></div></div>`).join('')}</div>
+  <div class="card"><h2>변경 이력 <span class="sub">최근 200건</span><button class="btn sm gray" id="lg-reload" style="margin-left:auto">새로고침</button></h2>
+   ${logs?(logs.length?`<div class="tbl-wrap" style="max-height:420px"><table class="m"><thead><tr><th>시각</th><th>작업자</th><th>작업</th><th class="nm" style="position:static">품목</th><th>위치</th><th>증감</th><th>내용</th></tr></thead><tbody>${logs.map(x=>`<tr><td>${dt(x.at)}</td><td>${esc(x.actor)}</td><td>${esc(actName(x.action))}</td><td style="text-align:left">${esc(x.item_name||'')}</td><td>${esc(x.loc||'')}</td><td>${x.delta?(x.delta>0?'+':'')+fmt(x.delta):''}</td><td style="text-align:left">${esc(x.detail||'')}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">이력 없음</div>'):'<div class="empty">불러오는 중…</div>'}</div>`;
+}
+function editForm(id){
+  const i=ITM[id],ph={v:''};
+  modal(`<h3>품목 수정</h3>${img(i,'photo')}
+  <label>품목명</label><input type="text" id="ed-name" value="${esc(i.name)}" maxlength="60">
+  <label>메모 (비고)</label><input type="text" id="ed-note" value="${esc(i.note||'')}" maxlength="60">
+  ${photoField('ed-file')}<label style="display:flex;gap:6px;align-items:center;color:var(--tx)"><input type="checkbox" id="ed-clr"> 업로드 사진 삭제(기본 사진으로 되돌리기)</label>
+  <label style="display:flex;gap:6px;align-items:center;color:var(--tx)"><input type="checkbox" id="ed-act" ${i.active?'checked':''}> 사용 중 (해제하면 목록에서 숨김)</label>
+  <div class="row" style="margin-top:14px"><button class="btn" id="ed-ok">저장</button><button class="btn gray" id="ed-x">취소</button></div>`,m=>{
+    photoBind(m,'ed-file',640,ph);m.querySelector('#ed-x').onclick=closeModal;
+    m.querySelector('#ed-ok').onclick=async()=>{const ok=await act('sup_item_update',{p_id:id,p_name:m.querySelector('#ed-name').value,p_photo:ph.v||null,p_clear_photo:m.querySelector('#ed-clr').checked,p_active:m.querySelector('#ed-act').checked,p_note:m.querySelector('#ed-note').value},'저장했습니다.');if(ok){PH={};closeModal()}};
+  });
+}
+function textPrompt(title,ph,cb){modal(`<h3>${esc(title)}</h3><input type="text" id="tp" placeholder="${esc(ph)}" maxlength="100"><div class="row" style="margin-top:14px"><button class="btn" id="tp-ok">확인</button><button class="btn gray" id="tp-x">취소</button></div>`,m=>{m.querySelector('#tp').focus();m.querySelector('#tp-x').onclick=closeModal;const go=()=>{const v=m.querySelector('#tp').value.trim();if(!v)return toast('내용을 입력해 주세요.');closeModal();cb(v)};m.querySelector('#tp-ok').onclick=go;m.querySelector('#tp').onkeydown=e=>{if(e.key==='Enter')go()}})}
+
+/* ---------- 이벤트 바인딩 ---------- */
+function bind(){
+  const M=$('#main'),on=(s,f)=>{const e=M.querySelector(s);if(e)e.onclick=f};
+  M.querySelectorAll('tr.it').forEach(r=>r.onclick=()=>itemModal(+r.dataset.id));
+  M.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{fCat=+b.dataset.cat;render()});
+  const fq=$('#f-q');if(fq)fq.oninput=e=>{fQ=e.target.value;render()};
+  const fm=$('#f-mine');if(fm)fm.onchange=e=>{fMine=e.target.checked;render()};
+  on('#mv-new',()=>moveForm(0));on('#ls-new',()=>lossForm(0));
+  M.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{const id=+b.dataset.id,a=b.dataset.mv;
+    if(a==='return')return returnForm(id);
+    if(a==='reject')return textPrompt('거절 사유','예) 수량이 다릅니다',v=>act('sup_move_resolve',{p_id:id,p_action:'reject',p_reason:v},'거절했습니다.'));
+    if(a==='cancel'&&!confirm('이 건을 취소할까요?'))return;
+    act('sup_move_resolve',{p_id:id,p_action:a,p_reason:null},a==='confirm'?'확인했습니다. 수량이 반영되었습니다.':'취소했습니다.')});
+  M.querySelectorAll('[data-rq]').forEach(b=>b.onclick=()=>{const id=+b.dataset.id,a=b.dataset.rq,x=(S.reqs||[]).find(z=>z.id===id);if(!x)return;
+    if(a==='go')return moveForm(x.item_id,{from:x.from_loc,to:x.req_loc,qty:x.qty,memo:x.memo,req:x.id});
+    if(a==='reject')return textPrompt('불가 사유','예) 행사 일정으로 사용 중입니다',v=>act('sup_req_resolve',{p_id:id,p_action:'reject',p_reason:v},'불가로 회신했습니다.'));
+    if(!confirm('이 요청을 취소할까요?'))return;act('sup_req_resolve',{p_id:id,p_action:'cancel',p_reason:null},'요청을 취소했습니다.')});
+  M.querySelectorAll('[data-ls]').forEach(b=>b.onclick=async()=>{const id=+b.dataset.id,a=b.dataset.ls;
+    if(a==='photo'){try{const p=await call('sup_loss_photo',{p_id:id});modal(`<h3>증빙 사진</h3>${p?`<img class="photo" src="${esc(p)}">`:'<div class="empty">사진이 없습니다.</div>'}<div class="row" style="margin-top:10px"><button class="btn gray" id="ph-x">닫기</button></div>`,m=>m.querySelector('#ph-x').onclick=closeModal)}catch(e){toast(errText(e))}return}
+    if(a==='reject')return textPrompt('반려 사유','예) 사진 재확인 필요',v=>act('sup_loss_resolve',{p_id:id,p_action:'reject',p_reason:v},'반려했습니다. 사진은 삭제됩니다.'));
+    if(a==='cancel'&&!confirm('신고를 취소할까요?'))return;
+    if(a==='confirm'&&!confirm('확인하면 수량이 차감되고 첨부 사진이 삭제됩니다. 진행할까요?'))return;
+    act('sup_loss_resolve',{p_id:id,p_action:a,p_reason:null},a==='confirm'?'확인했습니다. 수량 차감, 사진 삭제 완료.':'취소했습니다.')});
+  // 신규 등록
+  if($('#nw-ok')){const ph={v:''};photoBind(M,'nw-file',640,ph);
+    $('#nw-cat').onchange=e=>$('#nw-newcat').classList.toggle('hide',e.target.value!=='0');
+    $('#nw-ok').onclick=async()=>{const name=$('#nw-name').value.trim(),n=+$('#nw-qty').value,cat=+$('#nw-cat').value;
+      if(!name)return toast('품목명을 입력해 주세요.');if(!(n>0))return toast('수량을 입력해 주세요.');if(!isAdmin()&&!ph.v)return toast('제품 사진을 첨부해 주세요.');
+      if(!confirm(`"${name}" ${n}개를 ${isAdmin()?$('#nw-loc').value:ME.loc}에 등록할까요?\n(단가 3만원 이상 비품만 등록 대상입니다)`))return;
+      const r=await act('sup_item_create',{p_cat_no:cat,p_cat_name:$('#nw-catname')?$('#nw-catname').value:null,p_name:name,p_qty:n,p_photo:ph.v||null,p_at:isAdmin()?$('#nw-loc').value:ME.loc},'등록했습니다.');
+      if(r){PH={};tab='stock';render()}}}
+  // 월 확정
+  if($('#mo-ym')){$('#mo-ym').onchange=e=>{repYm=e.target.value;rep=null;render()};
+    on('#mo-do',async()=>{const ym=$('#mo-ym').value;if(!ym)return toast('월을 선택해 주세요.');
+      if(!confirm(`${monthLabel(ym)} 수량을 확정하고 보고서를 만들까요?${S.months.includes(ym)?'\n(이미 확정된 월입니다. 현재 수량으로 다시 저장됩니다)':''}`))return;
+      try{rep=await call('sup_month_confirm',{p_ym:ym});repYm=ym;toast('월 확정 완료');await load()}catch(e){toast(errText(e))}});
+    on('#mo-view',async()=>{try{const r=await call('sup_month_get',{p_ym:$('#mo-ym').value});if(r&&r.report&&r.report.ym){rep=r.report;rep._snap=r.snapshot;repYm=rep.ym;render()}else toast('보고서가 저장된 월이 아닙니다. "월 확정"을 눌러 생성해 주세요.')}catch(e){toast(errText(e))}});
+    M.querySelectorAll('[data-cp]').forEach(b=>b.onclick=async()=>{const k=b.dataset.cp;
+      if(k==='text')copyText(reportText(rep));
+      else if(k==='cat')copyText(catTableTSV(rep));
+      else if(k==='cathtml')copyText(catTableTSV(rep),catTableHTML(rep));
+      else if(k==='matrix'){let snap=rep._snap;if(!snap){const r=await call('sup_month_get',{p_ym:rep.ym});snap=r&&r.snapshot}if(snap)copyText(matrixTSV(snap))}})}
+  // 관리
+  M.querySelectorAll('[data-pw]').forEach(b=>b.onclick=()=>{const t=b.dataset.pw,v=M.querySelector(`[data-pwin="${t}"]`).value.trim();if(v.length<3)return toast('비밀번호는 3자 이상입니다.');act('sup_set_pw',{p_target:t,p_new:v},t+' 비밀번호를 변경했습니다.').then(()=>{M.querySelector(`[data-pwin="${t}"]`)&&(M.querySelector(`[data-pwin="${t}"]`).value='')})});
+  on('#pw-admin',()=>textPrompt('새 관리자 비밀번호','3자 이상',async v=>{if(v.length<3)return toast('3자 이상 입력해 주세요.');try{await call('sup_set_pw',{p_target:ADMIN,p_new:v});ME.pw=v;try{sessionStorage.setItem('sup_me',JSON.stringify(ME))}catch(e){}toast('관리자 비밀번호를 변경했습니다.')}catch(e){toast(errText(e))}}));
+  M.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editForm(+b.dataset.edit));
+  on('#lg-reload',loadLogs);
+}
+</script>
+</body>
+</html>
